@@ -89,13 +89,16 @@ def return_request(request, id):
     asset = get_object_or_404(Asset, id=id)
     borrower_data = Request.objects.filter(asset=asset, status='approved', request_type='borrow').last()
 
+    if not borrower_data:
+        messages.error(request, f"No active borrow record found for {asset.name}. Cannot process extension.")
+        return redirect('manage_assets')
+
     if request.method == 'POST':
         user_name = request.POST.get('user_name') or (borrower_data.user_name if borrower_data else "Unknown Staff")
         department = request.POST.get('department') or (borrower_data.department if borrower_data else "Unknown")
         email = request.POST.get('email') or (borrower_data.email if borrower_data else "")
         phone = request.POST.get('phone') or (borrower_data.phone if borrower_data else "")
-        current_user = request.user if request.user.is_authenticated else None
-
+      
         Request.objects.create(
             asset=asset,
             user=request.user,
@@ -121,13 +124,16 @@ def extend_request(request, id):
     asset = get_object_or_404(Asset, id=id)
     borrower_data = Request.objects.filter(asset=asset, status='approved', request_type='borrow').last()
 
+    if not borrower_data:
+        messages.error(request, f"No active borrow record found for {asset.name}. Cannot process return.")
+        return redirect('manage_assets')
+
     if request.method == 'POST':
         user_name = request.POST.get('user_name') or (borrower_data.user_name if borrower_data else "Unknown Staff")
         department = request.POST.get('department') or (borrower_data.department if borrower_data else "Unknown")
         email = request.POST.get('email') or (borrower_data.email if borrower_data else "")
         phone = request.POST.get('phone') or (borrower_data.phone if borrower_data else "")
-        current_user = request.user if request.user.is_authenticated else None
-
+        
         Request.objects.create(
             asset=asset,
             user=request.user if request.user.is_authenticated else None,
