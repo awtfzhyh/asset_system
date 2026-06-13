@@ -99,13 +99,9 @@
                     <td class="action-buttons">
                         <a href="/edit-asset/{{ asset.id }}/" class="btn-sm" style="background: #7f8c8d;">Edit</a>
 
-                        {% if asset.status == "Available" %}
                           <a href="{% url 'borrow_asset' asset.id %}" class="btn-sm" style="background: #3498db;">Borrow</a>
-                        
-                        {% elif asset.status == "Borrowed" %}
                             <a href="{% url 'return_asset' asset.id %}" class="btn-sm" style="background: #27ae60;">Return</a>
                             <a href="{% url 'extend_asset' asset.id %}" class="btn-sm" style="background: #e74c3c;">Extend</a>
-                        {% endif %}
                     </td>
                 </tr>
                 {% empty %}

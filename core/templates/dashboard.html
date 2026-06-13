@@ -53,9 +53,7 @@
                 </td>
                 <td>
                     {{ item.return_date|date:"d M Y" }}
-                    {% if item.return_date == now.date %}
                         <span class="badge" style="background:#f1c40f; color:black; font-size:10px;">DUE TODAY</span>
-                    {% endif %}
                 </td>
                 <td style="text-align: center;">
                     <a href="{% url 'return_asset' item.asset.id %}" class="btn-sm-action btn-return">Return</a>
