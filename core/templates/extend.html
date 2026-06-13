@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CoE Asset Extension Form</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f8f9fa; font-family: 'Inter', sans-serif; }
+        .form-container { max-width: 800px; margin: 50px auto; }
+        .form-card { background: #ffffff; border-radius: 12px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); border-top: 8px solid #ffc107; padding: 40px; }
+        .form-header h1 { font-weight: 700; color: #212529; margin-bottom: 10px; }
+        .form-description { color: #6c757d; font-size: 0.95rem; margin-bottom: 30px; }
+        .label-required::after { content: " *"; color: #dc3545; }
+        .form-label { font-weight: 600; color: #495057; }
+        .btn-warning { padding: 12px 30px; font-weight: 600; border-radius: 8px; color: #212529; }
+        .contact-info { background-color: #e9ecef; padding: 15px; border-radius: 8px; font-size: 0.9rem; }
+    </style>
+</head>
+<body>
+
+<div class="container form-container">
+    <div class="form-card">
+        <header class="form-header text-center">
+            <h1>CoE Asset Extension Form</h1>
+            <p class="form-description">Extending: <strong>{{ asset.name }}</strong></p>
+        </header>
+
+        <form method="POST" action="{% url 'extend_request' asset.id %}">
+            {% csrf_token %}
+            
+            <div class="row">
+                <div class="col-md-6 mb-4">
+                    <label for="user_name" class="form-label label-required">Borrower Name</label>
+                    <input type="text" class="form-control" name="user_name" value="{{ borrower.user_name }}" required>
+                </div>
+                <div class="col-md-6 mb-4">
+                    <label for="department" class="form-label label-required">Department</label>
+                    <input type="text" class="form-control" name="department" value="{{ borrower.department }}" required>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-4">
+                    <label for="email" class="form-label label-required">Email</label>
+                    <input type="email" class="form-control" name="email" value="{{ borrower.email }}" required>
+                </div>
+                <div class="col-md-6 mb-4">
+                    <label for="phone" class="form-label label-required">Phone No.</label>
+                    <input type="tel" class="form-control" name="phone" value="{{ borrower.phone }}" required>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-4">
+                    <label class="form-label">Current Due Date</label>
+                    <input type="text" class="form-control" value="{{ borrower.return_date|date:'d-m-Y' }}" disabled>
+                </div>
+                <div class="col-md-6 mb-4">
+                    <label for="return_date" class="form-label label-required">New Extension Date</label>
+                    <input type="date" class="form-control" name="return_date" required>
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <label for="purpose" class="form-label label-required">Reason for Extension</label>
+                <textarea class="form-control" name="purpose" rows="3" placeholder="Please explain why you need an extension..." required></textarea>
+            </div>
+
+            <div class="mt-4 d-grid gap-2">
+                <button type="submit" class="btn btn-warning">Request Extension</button>
+            </div>
+
+            <div class="mt-5 contact-info text-center">
+                Subject to availability. Contact <a href="mailto:coe@sdec.com.my" class="text-decoration-none fw-bold">coe@sdec.com.my</a>
+            </div>
+        </form>
+    </div>
+</div>
+</body>
+</html>

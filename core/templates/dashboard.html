@@ -1,0 +1,179 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h1>Dashboard</h1>
+
+<h2>Overview</h2>
+
+<div class="dashboard-grid">
+    <div class="card">
+        <h3>Total Assets</h3>
+        <p>{{ total_assets }}</p>
+    </div>
+
+    <div class="card">
+        <h3>Currently Borrowed</h3>
+        <p>{{ borrowed }}</p>
+    </div>
+
+    <div class="card" style="border-left-color: #e74c3c;"> <h3>Pending Return</h3>
+        <p style="color: #e74c3c;">{{ pending_return }}</p>
+    </div>
+
+    <div class="card">
+        <h3>History Records</h3>
+        <p>{{ history }}</p>
+    </div>
+</div>
+
+<h2 style="margin-top: 30px; color: #273c75;">📋 Active Asset Tracking</h2>
+<p class="text-muted">List of all items currently held by staff.</p>
+
+<div class="table-wrapper">
+    <table>
+        <thead>
+            <tr>
+                <th>Borrower</th>
+                <th>Asset</th>
+                <th>Return Date</th>
+                <th style="text-align: center;">Admin Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in currently_out %}
+            <tr>
+                <td>
+                    <strong>{{ item.user_name }}</strong><br>
+                    <small>{{ item.phone }}</small>
+                </td>
+                <td>
+                    {{ item.asset.name }}
+                    <br><small class="text-muted">S/N: {{ item.asset.serial_num }}</small>
+                </td>
+                <td>
+                    {{ item.return_date|date:"d M Y" }}
+                    {% if item.return_date == now.date %}
+                        <span class="badge" style="background:#f1c40f; color:black; font-size:10px;">DUE TODAY</span>
+                    {% endif %}
+                </td>
+                <td style="text-align: center;">
+                    <a href="{% url 'return_asset' item.asset.id %}" class="btn-sm-action btn-return">Return</a>
+                    <a href="{% url 'extend_asset' item.asset.id %}" class="btn-sm-action btn-extend">Extend</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4" class="empty-msg">No assets are currently borrowed.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<style>
+    .btn-sm-action {
+        padding: 5px 10px;
+        border-radius: 4px;
+        text-decoration: none;
+        font-size: 11px;
+        font-weight: 600;
+        margin: 0 2px;
+        display: inline-block;
+    }
+    .btn-return { background-color: #f39c12; color: white; }
+    .btn-extend { background-color: #3498db; color: white; }
+    .btn-return:hover, .btn-extend:hover { opacity: 0.8; color: white; }
+</style>
+
+<h2 style="margin-top: 30px; color: #e74c3c;">⚠️ Priority Alerts (Overdue)</h2>
+
+<div class="table-wrapper overdue-table">
+    <table>
+        <thead>
+            <tr>
+                <th>Asset Name</th>
+                <th>Borrower</th>
+                <th>Due Date</th>
+                <th>Days Overdue</th>
+                <th style="text-align: center;">Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for req in overdue %}
+            <tr class="overdue-row">
+                <td><strong>{{ req.asset.name }}</strong></td>
+                <td>{{ req.user_name }} <br><small>{{ req.phone }}</small></td>
+                <td class="text-danger"><strong>{{ req.return_date|date:"d M Y" }}</strong></td>
+                <td>
+                    <span class="badge-overdue">EXPIRED</span>
+                </td>
+                <td style="text-align: center;">
+                    <a href="{% url 'send_overdue_reminder' req.id %}" class="btn-notify">
+                        Send Email Reminder
+                    </a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" class="empty-msg">✅ No overdue items at the moment.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<style>
+    .dashboard-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+
+    .card {
+        background: white;
+        padding: 20px;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        border-left: 5px solid #273c75;
+    }
+
+    .card h3 { margin: 0; font-size: 14px; color: #888; text-transform: uppercase; }
+    .card p { margin: 10px 0 0; font-size: 28px; font-weight: bold; color: #273c75; }
+
+    /* Overdue Table Styles */
+    .table-wrapper {
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+    table { width: 100%; border-collapse: collapse; }
+    th { background: #f8f9fa; padding: 15px; text-align: left; font-size: 12px; color: #666; }
+    td { padding: 15px; border-bottom: 1px solid #eee; font-size: 14px; }
+    
+    .overdue-row:hover { background-color: #fff5f5; }
+    .text-danger { color: #e74c3c; }
+
+    .badge-overdue {
+        background: #f8d7da;
+        color: #721c24;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 11px;
+        font-weight: bold;
+    }
+
+    .btn-notify {
+        background: #273c75;
+        color: white;
+        padding: 6px 12px;
+        border-radius: 6px;
+        text-decoration: none;
+        font-size: 12px;
+    }
+
+    .empty-msg { text-align: center; color: #999; padding: 40px !important; }
+</style>
+{% endblock %}

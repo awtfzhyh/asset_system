@@ -1,0 +1,148 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="form-container">
+    <div class="form-header">
+        <nav class="breadcrumb">
+            <a href="/">Dashboard</a> / <a href="{% url 'manage_assets' %}">Assets</a> / <span>Add New</span>
+        </nav>
+        <h2>Add New Asset</h2>
+    </div>
+
+    <div class="form-card">
+        <form method="POST">
+            {% csrf_token %} 
+            
+            <div class="form-grid">
+                <div class="form-column">
+                    <div class="input-group">
+                        <label>Asset Name</label>
+                        <input type="text" name="name" placeholder="e.g. Dell Latitude 5420" required>
+                    </div>
+
+                    <div class="input-group">
+                        <label>Category</label>
+                        <input type="text" name="category" placeholder="e.g. IT Equipment" required>
+                    </div>
+
+                    <div class="input-group">
+                        <label>Status</label>
+                        <select name="status">
+                            <option value="Available">Available</option>
+                            <option value="Borrowed">Borrowed</option>
+                            <option value="Damaged">Damaged</option>
+                        </select>
+                    </div>
+
+                    <div class="input-group">
+                        <label>Location</label>
+                        <input type="text" name="location" placeholder="e.g. Level 2, IT Room">
+                    </div>
+                </div>
+
+                <div class="form-column">
+                    <div class="input-group">
+                        <label>Brand</label>
+                        <input type="text" name="brand" placeholder="e.g. Dell">
+                    </div>
+
+                    <div class="input-group">
+                        <label>Model</label>
+                        <input type="text" name="model" placeholder="e.g. Precision 3650">
+                    </div>
+
+                    <div class="input-group">
+                        <label>Serial Number</label>
+                        <input type="text" name="serial_num" placeholder="e.g. SN-12345678">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-save">Save Asset</button>
+                <a href="{% url 'manage_assets' %}" class="btn btn-cancel">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    .form-container { max-width: 800px; margin: 0 auto; padding-top: 20px; }
+    
+    .breadcrumb { font-size: 13px; color: #888; margin-bottom: 8px; }
+    .breadcrumb a { color: #f57c00; text-decoration: none; }
+    
+    .form-header h2 { color: #2c3e50; margin-bottom: 25px; }
+
+    .form-card {
+        background: white;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    }
+
+    /* Grid Layout for two columns on larger screens */
+    .form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 25px;
+    }
+
+    .input-group { margin-bottom: 18px; }
+
+    .input-group label {
+        display: block;
+        font-size: 13px;
+        font-weight: 600;
+        color: #555;
+        margin-bottom: 8px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .input-group input, .input-group select {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        font-size: 14px;
+        transition: all 0.3s;
+        box-sizing: border-box; /* Important for width */
+    }
+
+    .input-group input:focus, .input-group select:focus {
+        border-color: #f57c00;
+        box-shadow: 0 0 0 3px rgba(245, 124, 0, 0.1);
+        outline: none;
+    }
+
+    .form-actions {
+        margin-top: 30px;
+        padding-top: 20px;
+        border-top: 1px solid #eee;
+        display: flex;
+        gap: 12px;
+    }
+
+    .btn {
+        padding: 12px 25px;
+        border-radius: 8px;
+        font-weight: bold;
+        cursor: pointer;
+        text-decoration: none;
+        font-size: 14px;
+        border: none;
+        transition: 0.2s;
+    }
+
+    .btn-save { background: #2c3e50; color: white; }
+    .btn-save:hover { background: #1a252f; transform: translateY(-1px); }
+
+    .btn-cancel { background: #f8f9fa; color: #666; display: flex; align-items: center; }
+    .btn-cancel:hover { background: #e9ecef; }
+
+    /* Responsive adjustment */
+    @media (max-width: 600px) {
+        .form-grid { grid-template-columns: 1fr; }
+    }
+</style>
+{% endblock %}

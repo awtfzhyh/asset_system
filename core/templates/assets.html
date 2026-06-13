@@ -1,0 +1,213 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="manage-container">
+    <div class="header-section">
+        <nav class="breadcrumb">
+            <a href="/">Dashboard</a> / <span>Manage Assets</span>
+        </nav>
+        <div class="header-flex">
+            <h2>Manage Assets</h2>
+            <span class="asset-count">Total Assets: <strong>{{ assets.count }}</strong></span>
+        </div>
+    </div>
+
+        <div class="filter-section">
+        <form method="GET" action="" class="filter-form">
+            <div class="filter-group">
+                <label class="filter-label">Search</label>
+                <input type="text" name="search" placeholder="Asset Name or ID..." value="{{ request.GET.search }}">
+            </div>
+            
+            <div class="filter-group">
+                <label class="filter-label">Category</label>
+                <select name="category">
+                    <option value="">All Categories</option>
+                    {% for cat in categories %}
+                        {% if cat %} {# This check prevents empty categories from showing #}
+                            <option value="{{ cat }}" {% if request.GET.category == cat %}selected{% endif %}>
+                                {{ cat }}
+                            </option>
+                        {% endif %}
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label class="filter-label">Status</label>
+                <select name="status">
+                    <option value="">All Status</option>
+                    <option value="Available" {% if request.GET.status == 'Available' %}selected{% endif %}>Available</option>
+                    <option value="Borrowed" {% if request.GET.status == 'Borrowed' %}selected{% endif %}>Borrowed</option>
+                </select>
+            </div>
+
+            <div class="filter-actions">
+                <button type="submit" class="btn btn-primary">Apply Filters</button>
+                <a href="{% url 'manage_assets' %}" class="btn btn-reset">Reset</a>
+            </div>
+            
+            <div class="add-action">
+                <a href="{% url 'add_asset' %}" class="btn-add">+ Add New Asset</a>
+            </div>
+        </form>
+    </div>
+
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Asset ID</th>
+                    <th>QR Code</th><th>Asset Name</th>
+                    <th>Category</th>
+                    <th>Status</th>
+                    <th>Location</th>
+                    <th style="text-align: center;">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for asset in assets %}
+                <tr>
+                    <td class="id-text">#{{ asset.id }}</td>
+                    <td style="text-align: center;">
+                        {% if asset.id %}
+                            <a href="{% url 'asset_qr' asset.id %}" target="_blank">
+                                <img src="{% url 'asset_qr' asset.id %}" alt="QR" style="width: 45px; height: 45px; border: 1px solid #eee; padding: 2px;">
+                            </a>
+                        {% else %}
+                            <span style="color: #ccc;">N/A</span>
+                        {% endif %}
+                    </td>
+                    
+                    <td><strong>{{ asset.name }}</strong></td>
+                    <td><span class="tag-category">{{ asset.category }}</span></td>
+                   <td>
+                        {% if asset.status == "Borrowed" %}
+                            <span class="status-badge borrowed">Borrowed</span>
+                            {% with last_req=asset.request_set.last %}
+                                {% if last_req and not last_req.return_date %}
+                                    <div style="font-size: 10px; color: #856404; margin-top: 4px;">
+                                        By: {{ last_req.user_name }}
+                                    </div>
+                                {% endif %}
+                            {% endwith %}
+                        {% else %}
+                            <span class="status-badge available">Available</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ asset.location }}</td>
+                    <td class="action-buttons">
+                        <a href="/edit-asset/{{ asset.id }}/" class="btn-sm" style="background: #7f8c8d;">Edit</a>
+
+                        {% if asset.status == "Available" %}
+                          <a href="{% url 'borrow_asset' asset.id %}" class="btn-sm" style="background: #3498db;">Borrow</a>
+                        
+                        {% elif asset.status == "Borrowed" %}
+                            <a href="{% url 'return_asset' asset.id %}" class="btn-sm" style="background: #27ae60;">Return</a>
+                            <a href="{% url 'extend_asset' asset.id %}" class="btn-sm" style="background: #e74c3c;">Extend</a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" style="text-align: center; padding: 50px; color: #999;">
+                        No assets found matching your criteria.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    
+
+<style>
+    /* Layout & Header */
+    .header-section { margin-bottom: 20px; }
+    .breadcrumb { font-size: 13px; color: #888; margin-bottom: 5px; }
+    .breadcrumb a { color: #f57c00; text-decoration: none; }
+    .header-flex { display: flex; justify-content: space-between; align-items: center; }
+    .asset-count { background: #eee; padding: 4px 12px; border-radius: 20px; font-size: 13px; color: #555; }
+
+    /* Filter Section */
+    .filter-section {
+        background: white;
+        padding: 20px;
+        margin-bottom: 25px;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+    .filter-form {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+    .filter-inputs { display: flex; gap: 10px; flex-wrap: wrap; }
+    
+    .filter-form input, .filter-form select {
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        outline: none;
+        transition: 0.2s;
+    }
+    .filter-form input:focus { border-color: #f57c00; }
+
+    /* Buttons */
+    .btn-primary { background: #2c3e50; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; }
+    .btn-add {
+        background: #f57c00;
+        color: white;
+        padding: 11px 20px;
+        text-decoration: none;
+        border-radius: 6px;
+        font-weight: bold;
+        transition: 0.3s;
+    }
+    .btn-add:hover { background: #e65100; box-shadow: 0 4px 12px rgba(245, 124, 0, 0.2); }
+
+    /* Table Design */
+    .table-container {
+        background: white;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    }
+    table { width: 100%; border-collapse: collapse; }
+    th { background: #f8f9fa; color: #666; font-size: 12px; text-transform: uppercase; padding: 15px; border-bottom: 2px solid #eee; }
+    td { padding: 15px; border-bottom: 1px solid #f1f1f1; vertical-align: middle; }
+    tr:hover { background-color: #fafafa; }
+
+    .id-text { color: #888; font-family: monospace; }
+    .tag-category { background: #f1f1f1; padding: 3px 8px; border-radius: 4px; font-size: 12px; color: #666; }
+
+    /* Status Badges */
+    .status-badge {
+        padding: 5px 12px;
+        border-radius: 15px;
+        font-size: 11px;
+        font-weight: bold;
+        display: inline-block;
+    }
+    .status-badge.available { background: #d4edda; color: #155724; }
+    .status-badge.borrowed { background: #fff3cd; color: #856404; }
+    .status-badge.default { background: #eee; color: #555; }
+
+    /* Row Buttons */
+    .action-buttons { text-align: center; white-space: nowrap; }
+    .btn-sm {
+        padding: 6px 12px;
+        color: white;
+        text-decoration: none;
+        border-radius: 4px;
+        font-size: 12px;
+        font-weight: 500;
+        display: inline-block;
+        margin-right: 2px;
+        transition: 0.2s;
+    }
+    .btn-sm:hover { opacity: 0.9; transform: translateY(-1px); }
+</style>
+{% endblock %}

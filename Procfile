@@ -1,0 +1,1 @@
+web: python manage.py migrate && gunicorn asset_system.wsgi --bind 0.0.0.0:$PORT

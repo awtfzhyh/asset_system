@@ -1,0 +1,210 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="requests-container">
+    <nav class="breadcrumb">
+        <a href="/">Dashboard</a> / <span>User Requests</span>
+    </nav>
+
+    <div class="header-flex">
+        <h1>User Requests</h1>
+        <div class="stats-pills">
+            <span class="pill pill-pending">Pending: <strong>{{ pending }}</strong></span>
+            <span class="pill pill-approved">Approved Today: <strong>{{ approved_today }}</strong></span>
+            <span class="pill pill-rejected">Rejected Today: <strong>{{ rejected_today }}</strong></span>
+        </div>
+    </div>
+
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>User & Department</th>
+                    <th>Asset Name</th>
+                    <th>Type</th>
+                    <th>Date Requested</th>
+                    <th>Status</th>
+                    <th style="text-align: center;">Decision</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for req in requests %}
+                <tr>
+                    <td class="id-cell">#{{ req.id }}</td>
+                    <td>
+                        <strong>{{ req.user_name }}</strong><br>
+                        <small style="color: #888;">{{ req.department|default:"General" }}</small>
+                    </td>
+                    <td>{{ req.asset.name }}</td>
+                    <td>
+                        <span class="type-tag">{{ req.request_type|upper }}</span>
+                    </td>
+                    <td class="date-cell">{{ req.created_at|date:"d M Y, H:i" }}</td>
+                    <td>
+                        <span class="status-badge status-{{ req.status|lower }}">
+                            {{ req.status }}
+                        </span>
+                    </td>
+                    <td class="action-cell">
+                        {% if req.status|lower == 'pending' %}
+                            <button class="btn btn-review" 
+                                    onclick="openReviewModal({
+                                        id: '{{ req.id }}',
+                                        user: '{{ req.user_name|escapejs }}',
+                                        dept: '{{ req.department|default:'General'|escapejs }}',
+                                        asset: '{{ req.asset.name|escapejs }}',
+                                        type: '{{ req.request_type|escapejs }}',
+                                        purpose: '{{ req.purpose|default:''|escapejs }}',
+                                        count: '{{ req.item_count|default:'1'|escapejs }}',
+                                        email: '{{ req.email|escapejs }}',
+                                        phone: '{{ req.phone|escapejs }}',
+                                        borrow_date: '{{ req.date_borrowed|date:"d M Y" }}',
+                                        return_date: '{{ req.return_date|date:"d M Y" }}'
+                                    })">
+                                Review
+                            </button>
+                        {% else %}
+                            <span class="finalized">Processed</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" class="empty-msg">No pending requests found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div id="reviewModal" class="modal-overlay">
+    <div class="modal-content">
+        <h3>Request Details</h3>
+        <hr>
+        <div id="modalData">
+            </div>
+        <div class="modal-footer">
+            <button onclick="closeModal('reviewModal')" class="btn btn-secondary">Close</button>
+            <button id="approveLink" class="btn btn-approve">Approve</button>
+            <button onclick="openRejectModal()" class="btn btn-reject">Reject</button>
+        </div>
+    </div>
+</div>
+
+<div id="rejectModal" class="modal-overlay">
+    <div class="modal-content">
+        <h3>Rejection Reason</h3>
+        <form id="rejectForm" method="POST">
+            {% csrf_token %}
+            <textarea name="reason" required placeholder="Why is this being rejected?" style="width:100%; height:100px; padding:10px; margin-top:10px; border-radius:8px; border:1px solid #ddd;"></textarea>
+            <div class="modal-footer">
+                <button type="button" onclick="closeModal('rejectModal')" class="btn btn-secondary">Back</button>
+                <button type="submit" class="btn btn-reject">Confirm Reject</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    /* Header & Stats */
+    .header-flex { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 15px; }
+    .breadcrumb { font-size: 13px; color: #888; margin-bottom: 10px; }
+    .breadcrumb a { color: #f57c00; text-decoration: none; }
+
+    .stats-pills { display: flex; gap: 10px; }
+    .pill { padding: 6px 15px; border-radius: 20px; font-size: 13px; background: white; border: 1px solid #ddd; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+    .pill-pending { border-left: 4px solid #f39c12; }
+    .pill-approved { border-left: 4px solid #27ae60; }
+    .pill-rejected { border-left: 4px solid #e74c3c; }
+
+    /* Table */
+    .table-wrapper { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.08); }
+    table { width: 100%; border-collapse: collapse; }
+    th { background: #273c75; color: white; text-align: left; padding: 15px; font-size: 12px; text-transform: uppercase; }
+    td { padding: 15px; border-bottom: 1px solid #f1f1f1; font-size: 14px; vertical-align: middle; }
+    tr:hover { background-color: #f8f9ff; }
+
+    .id-cell { color: #999; font-family: monospace; }
+    .type-tag { background: #f1f2f6; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; }
+    .date-cell { color: #7f8c8d; font-size: 13px; }
+
+    /* Status Badges */
+    .status-badge { padding: 5px 12px; border-radius: 15px; font-size: 11px; font-weight: bold; text-transform: uppercase; }
+    .status-pending { background: #fff3cd; color: #856404; }
+    .status-approved { background: #d4edda; color: #155724; }
+    .status-rejected { background: #f8d7da; color: #721c24; }
+
+    /* Modal Styling */
+    .modal-overlay { display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); justify-content: center; align-items: center; }
+    .modal-content { background: white; padding: 25px; border-radius: 12px; width: 100%; max-width: 550px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+    .modal-footer { margin-top: 20px; display: flex; justify-content: flex-end; gap: 10px; }
+    
+    /* Grid for Modal Info */
+    .modal-info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+    .info-item { padding: 8px; border-bottom: 1px solid #eee; }
+    .info-item label { display: block; font-size: 11px; color: #888; text-transform: uppercase; margin-bottom: 2px; }
+    .info-item span { font-size: 14px; color: #333; font-weight: 500; }
+
+    /* Buttons */
+    .action-cell { text-align: center; }
+    .btn { padding: 8px 16px; border-radius: 6px; font-size: 12px; font-weight: bold; cursor: pointer; border: none; transition: 0.2s; }
+    .btn-review { background-color: #273c75; color: white; }
+    .btn-approve { background-color: #27ae60; color: white; }
+    .btn-reject { background-color: #e74c3c; color: white; }
+    .btn-secondary { background-color: #bdc3c7; color: white; }
+    .btn:hover { opacity: 0.9; transform: translateY(-1px); }
+</style>
+
+<script>
+    let currentId = null;
+
+    function openReviewModal(data) {
+        currentId = data.id;
+        const container = document.getElementById('modalData');
+        
+        // Comprehensive Info Display
+        container.innerHTML = `
+            <div class="modal-info-grid">
+                <div class="info-item"><label>Request ID</label><span>#${data.id}</span></div>
+                <div class="info-item"><label>Type</label><span>${data.type.toUpperCase()}</span></div>
+                <div class="info-item"><label>Borrower Name</label><span>${data.user}</span></div>
+                <div class="info-item"><label>Department</label><span>${data.dept}</span></div>
+                <div class="info-item"><label>Email</label><span>${data.email}</span></div>
+                <div class="info-item"><label>Phone</label><span>${data.phone}</span></div>
+                <div class="info-item"><label>Asset</label><span>${data.asset}</span></div>
+                <div class="info-item"><label>Quantity</label><span>${data.count}</span></div>
+                <div class="info-item"><label>Date Borrowed</label><span>${data.borrow_date}</span></div>
+                <div class="info-item"><label>Return Date</label><span>${data.return_date}</span></div>
+            </div>
+            <div style="margin-top: 15px; padding: 10px; background: #f9f9f9; border-radius: 8px;">
+                <label style="font-size: 11px; color: #888; text-transform: uppercase;">Purpose of Request</label>
+                <p style="margin: 5px 0 0 0; font-size: 14px; line-height: 1.4;">${data.purpose || 'No purpose stated.'}</p>
+            </div>
+        `;
+
+        document.getElementById('approveLink').onclick = function() {
+            window.location.href = '/approve/' + data.id + '/';
+        };
+
+        document.getElementById('reviewModal').style.display = 'flex';
+    }
+
+    function openRejectModal() {
+        document.getElementById('reviewModal').style.display = 'none';
+        document.getElementById('rejectForm').action = '/reject/' + currentId + '/';
+        document.getElementById('rejectModal').style.display = 'flex';
+    }
+
+    function closeModal(id) {
+        document.getElementById(id).style.display = 'none';
+    }
+
+    window.onclick = function(event) {
+        if (event.target.classList.contains('modal-overlay')) {
+            event.target.style.display = 'none';
+        }
+    }
+</script>
+{% endblock %}

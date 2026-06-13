@@ -1,0 +1,93 @@
+
+{% block content %}
+<div class="detail-container">
+    <div class="detail-card">
+        <div class="status-banner {% if asset.status == 'Available' %}bg-success{% elif asset.status == 'Damaged' %}bg-danger{% else %}bg-warning{% endif %}">
+            {{ asset.status|upper }}
+        </div>
+
+        <div class="detail-body">
+            <div class="detail-header">
+                <span class="tag-category">{{ asset.category }}</span>
+                <h2>{{ asset.name }}</h2>
+                <p class="asset-id">ID: #{{ asset.id }}</p>
+            </div>
+
+            <div class="info-list">
+                <div class="info-row">
+                    <label>Location</label>
+                    <span>{{ asset.location|default:"General Office" }}</span>
+                </div>
+                <div class="info-row">
+                    <label>Brand</label>
+                    <span>{{ asset.brand|default:"---" }}</span>
+                </div>
+                <div class="info-row">
+                    <label>Model</label>
+                    <span>{{ asset.model|default:"---" }}</span>
+                </div>
+                <div class="info-row">
+                    <label>Serial No.</label>
+                    <span class="serial">{{ asset.serial_num|default:"---" }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .detail-container { max-width: 450px; margin: 40px auto; padding: 20px; }
+    
+    .detail-card { 
+        background: white; 
+        border-radius: 20px; 
+        box-shadow: 0 15px 40px rgba(0,0,0,0.12); 
+        overflow: hidden; /* Important for the banner */
+    }
+
+    /* Status Banner Styles */
+    .status-banner {
+        padding: 12px;
+        color: white;
+        font-weight: 800;
+        font-size: 14px;
+        letter-spacing: 1px;
+        text-align: center;
+    }
+    .bg-success { background: #27ae60; } /* Green for Available */
+    .bg-warning { background: #f39c12; } /* Orange for Borrowed */
+    .bg-danger { background: #e74c3c; }  /* Red for Damaged */
+
+    .detail-body { padding: 30px; text-align: center; }
+    
+    .detail-header h2 { font-size: 22px; color: #2c3e50; margin: 10px 0; }
+    .asset-id { color: #95a5a6; font-size: 13px; margin-bottom: 20px; }
+
+    .info-list { margin: 25px 0; text-align: left; }
+    .info-row { 
+        display: flex; 
+        justify-content: space-between; 
+        padding: 14px 0; 
+        border-bottom: 1px solid #f8f9fa; 
+    }
+    .info-row label { font-size: 11px; color: #bdc3c7; text-transform: uppercase; font-weight: bold; }
+    .info-row span { font-size: 15px; color: #34495e; font-weight: 600; }
+    .serial { font-family: 'Courier New', monospace; }
+
+    .detail-actions { display: flex; justify-content: space-between; align-items: center; margin-top: 30px; }
+    .btn-back { color: #bdc3c7; text-decoration: none; font-size: 14px; font-weight: 500; }
+    
+    .btn-manage { 
+        background: #2c3e50; 
+        color: white; 
+        padding: 12px 24px; 
+        border-radius: 12px; 
+        text-decoration: none; 
+        font-weight: bold; 
+        font-size: 14px;
+        box-shadow: 0 4px 10px rgba(44, 62, 80, 0.2);
+    }
+
+    .tag-category { background: #f1f4f8; color: #5dade2; padding: 4px 12px; border-radius: 8px; font-size: 11px; font-weight: bold; }
+</style>
+{% endblock %}

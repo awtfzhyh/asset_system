@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CoE Asset Borrowing Form</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f8f9fa; font-family: 'Inter', sans-serif; }
+        .form-container { max-width: 800px; margin: 50px auto; }
+        .form-card { background: #ffffff; border-radius: 12px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); border-top: 8px solid #0d6efd; padding: 40px; }
+        .form-header h1 { font-weight: 700; color: #212529; margin-bottom: 10px; }
+        .form-description { color: #6c757d; font-size: 0.95rem; margin-bottom: 30px; }
+        .label-required::after { content: " *"; color: #dc3545; }
+        .form-label { font-weight: 600; color: #495057; }
+        .btn-primary { padding: 12px 30px; font-weight: 600; border-radius: 8px; background-color: #0d6efd; }
+        .contact-info { background-color: #e9ecef; padding: 15px; border-radius: 8px; font-size: 0.9rem; }
+    </style>
+</head>
+<body>
+
+<div class="container form-container">
+    <div class="form-card">
+        <header class="form-header text-center">
+            <h1>CoE Asset Borrowing Form</h1>
+            <p class="form-description">Please fill in the form below to request equipment.</p>
+        </header>
+
+        <form method="POST">
+            {% csrf_token %}
+            
+            <div class="mb-4">
+                <label for="department" class="form-label label-required">Department</label>
+                <select class="form-select" id="department" name="department" required>
+                    <option value="" selected disabled>Select an option</option>
+                    <option value="RPD">RPD</option>
+                    <option value="Finance">Finance</option>
+                    <option value="HR">HR</option>
+                    <option value="Marketing">Marketing</option>
+                    <option value="Digital Economy">Digital Economy</option>
+                </select>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-4">
+                    <label for="user_name" class="form-label label-required">Borrower Name</label>
+                    <input type="text" class="form-control" id="user_name" name="user_name" placeholder="Full Name" required>
+                </div>
+                <div class="col-md-6 mb-4">
+                    <label for="phone" class="form-label label-required">Phone No.</label>
+                    <input type="tel" class="form-control" id="phone" name="phone" placeholder="e.g. 012-3456789" required>
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <label for="email" class="form-label label-required">Email</label>
+                <input type="email" class="form-control" id="email" name="email" placeholder="email@example.com" required>
+            </div>
+
+            <div class="row">
+                <div class="col-md-8 mb-4">
+                    <label for="asset" class="form-label label-required">Select Asset</label>
+                    <select class="form-select" id="asset" name="asset" required>
+                        <option value="" disabled {% if not selected_asset %}selected{% endif %}>Choose an equipment...</option>
+                        {% for a in assets %}
+                            <option value="{{ a.id }}" {% if selected_asset and selected_asset.id == a.id %}selected{% endif %}>
+                                {{ a.name }} ({{ a.brand }} - {{ a.serial_num }})
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <label for="item_count" class="form-label label-required">Quantity</label>
+                    <input type="number" class="form-control" id="item_count" name="item_count" min="1" value="1" required>
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <label for="purpose" class="form-label label-required">Purpose of borrowing</label>
+                <textarea class="form-control" id="purpose" name="purpose" rows="3" required></textarea>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-4">
+                    <label for="date_borrowed" class="form-label label-required">Date borrowed</label>
+                    <input type="date" class="form-control" id="date_borrowed" name="date_borrowed" required>
+                </div>
+                <div class="col-md-6 mb-4">
+                    <label for="return_date" class="form-label label-required">To be returned date</label>
+                    <input type="date" class="form-control" id="return_date" name="return_date" required>
+                </div>
+            </div>
+
+            <div class="mt-4 d-grid gap-2">
+                <button type="submit" class="btn btn-primary">Submit Form</button>
+            </div>
+
+            <div class="mt-5 contact-info text-center">
+                If you have any inquiry, please do not hesitate to contact our CoE Coordinator at 
+                <a href="mailto:coe@sdec.com.my" class="text-decoration-none fw-bold">coe@sdec.com.my</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

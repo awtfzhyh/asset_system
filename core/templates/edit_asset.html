@@ -1,0 +1,137 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="form-container">
+    <div class="form-header">
+        <nav class="breadcrumb">
+            <a href="/">Dashboard</a> / <a href="{% url 'manage_assets' %}">Assets</a> / <span>Edit Asset #{{ asset.id }}</span>
+        </nav>
+        <div class="header-flex">
+            <h2>Edit Asset Details</h2>
+            <span class="asset-id-badge">ID: {{ asset.id }}</span>
+        </div>
+    </div>
+
+    <div class="edit-grid">
+        <div class="form-card">
+            <form method="POST">
+                {% csrf_token %}
+                
+                <div class="form-row">
+                    <div class="input-group">
+                        <label>Asset Name</label>
+                        <input type="text" name="name" value="{{ asset.name }}" required>
+                    </div>
+                </div>
+
+                <div class="form-grid-inner">
+                    <div class="input-group">
+                        <label>Category</label>
+                        <input type="text" name="category" value="{{ asset.category }}" required>
+                    </div>
+                    <div class="input-group">
+                        <label>Status</label>
+                        <select name="status">
+                            <option value="Available" {% if asset.status == "Available" %}selected{% endif %}>Available</option>
+                            <option value="Borrowed" {% if asset.status == "Borrowed" %}selected{% endif %}>Borrowed</option>
+                            <option value="Damaged" {% if asset.status == "Damaged" %}selected{% endif %}>Damaged</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-grid-inner">
+                    <div class="input-group">
+                        <label>Brand</label>
+                        <input type="text" name="brand" value="{{ asset.brand }}">
+                    </div>
+                    <div class="input-group">
+                        <label>Model</label>
+                        <input type="text" name="model" value="{{ asset.model }}">
+                    </div>
+                </div>
+
+                <div class="form-grid-inner">
+                    <div class="input-group">
+                        <label>Serial Number</label>
+                        <input type="text" name="serial_num" value="{{ asset.serial_num }}">
+                    </div>
+                    <div class="input-group">
+                        <label>Location</label>
+                        <input type="text" name="location" value="{{ asset.location }}">
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-update">Update Asset</button>
+                    <a href="{% url 'manage_assets' %}" class="btn btn-cancel">Cancel</a>
+                    
+                    <a href="/delete-asset/{{ asset.id }}/" 
+                       class="btn btn-delete" 
+                       onclick="return confirm('Are you sure you want to delete this asset?')">
+                       Delete Asset
+                    </a>
+                </div>
+            </form>
+        </div>
+
+        <div class="qr-sidebar">
+            <div class="qr-card">
+                <h4>Asset QR Code</h4>
+                <img src="{% url 'asset_qr' asset.id %}" alt="QR">
+                <p>Scan to quickly access this page on another device.</p>
+                <a href="{% url 'asset_qr' asset.id %}" download="asset_{{ asset.id }}.png" class="btn-download">Download Image</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .form-container { max-width: 1000px; margin: 0 auto; padding: 20px; }
+    .header-flex { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .asset-id-badge { background: #eef2f7; padding: 5px 15px; border-radius: 20px; font-weight: bold; color: #555; }
+    
+    .breadcrumb { font-size: 13px; color: #888; margin-bottom: 8px; }
+    .breadcrumb a { color: #f57c00; text-decoration: none; }
+
+    /* Layout Grid */
+    .edit-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; }
+
+    .form-card, .qr-card {
+        background: white;
+        padding: 25px;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    }
+
+    .form-grid-inner { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+    .input-group { margin-bottom: 15px; }
+    .input-group label { display: block; font-size: 12px; font-weight: bold; color: #666; text-transform: uppercase; margin-bottom: 5px; }
+    .input-group input, .input-group select {
+        width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;
+    }
+
+    .form-actions { 
+        margin-top: 20px; padding-top: 20px; border-top: 1px solid #eee; 
+        display: flex; flex-wrap: wrap; gap: 10px;
+    }
+
+    /* Buttons */
+    .btn { padding: 10px 20px; border-radius: 6px; border: none; font-weight: 600; cursor: pointer; text-decoration: none; font-size: 14px; }
+    .btn-update { background: #2c3e50; color: white; }
+    .btn-cancel { background: #eee; color: #555; }
+    .btn-delete { background: #ffe3e3; color: #e74c3c; margin-left: auto; }
+    .btn-delete:hover { background: #e74c3c; color: white; }
+
+    /* QR Sidebar */
+    .qr-card { text-align: center; }
+    .qr-card img { width: 100%; max-width: 150px; border: 1px solid #eee; margin: 15px 0; }
+    .qr-card h4 { margin: 0; color: #2c3e50; }
+    .qr-card p { font-size: 12px; color: #888; margin-bottom: 15px; }
+    .btn-download { font-size: 12px; color: #f57c00; text-decoration: none; font-weight: bold; }
+
+    @media (max-width: 768px) {
+        .edit-grid { grid-template-columns: 1fr; }
+        .form-grid-inner { grid-template-columns: 1fr; }
+        .btn-delete { margin-left: 0; width: 100%; text-align: center; }
+    }
+</style>
+{% endblock %}

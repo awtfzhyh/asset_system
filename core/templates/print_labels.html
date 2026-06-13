@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="no-print" style="margin-bottom: 20px; padding: 20px; background: #fff3cd; border-radius: 8px;">
+    <h3>🖨️ Print Preview</h3>
+    <p>Use <b>Ctrl + P</b> to print these labels. Ensure "Background Graphics" is enabled in your print settings.</p>
+    <button onclick="window.print()" class="btn btn-primary">Print Now</button>
+    <a href="{% url 'manage_assets' %}" class="btn btn-reset">Back to Assets</a>
+</div>
+
+<div class="label-grid">
+    {% for asset in assets %}
+    <div class="label-card">
+        <div class="label-header">ASSET #{{ asset.id }}</div>
+        <img src="{% url 'asset_qr' asset.id %}" alt="QR">
+        <div class="label-name">{{ asset.name|truncatechars:20 }}</div>
+        <div class="label-footer">{{ asset.category }}</div>
+    </div>
+    {% endfor %}
+</div>
+
+<style>
+    /* Grid for the labels */
+    .label-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 15px;
+        background: white;
+        padding: 10px;
+    }
+
+    /* Individual Label Style */
+    .label-card {
+        border: 1px dashed #ccc;
+        padding: 10px;
+        text-align: center;
+        background: white;
+        border-radius: 5px;
+    }
+
+    .label-header { font-size: 10px; font-weight: bold; color: #666; margin-bottom: 5px; }
+    .label-card img { width: 100px; height: 100px; }
+    .label-name { font-size: 12px; font-weight: bold; margin-top: 5px; }
+    .label-footer { font-size: 10px; color: #888; margin-top: 2px; }
+
+    /* Print Logic */
+    @media print {
+        .no-print { display: none !important; } /* Hides nav/buttons */
+        body { background: white !important; }
+        .label-grid { 
+            grid-template-columns: repeat(4, 1fr); /* Force 4 labels per row on A4 */
+            gap: 10px;
+        }
+        .label-card { border: 1px solid #eee; page-break-inside: avoid; }
+    }
+</style>
+{% endblock %}
