@@ -90,18 +90,22 @@ def return_request(request, id):
     borrower_data = Request.objects.filter(asset=asset, status='approved', request_type='borrow').last()
 
     if request.method == 'POST':
+        user_name = request.POST.get('user_name') or (borrower_data.user_name if borrower_data else "Unknown Staff")
+        department = request.POST.get('department') or (borrower_data.department if borrower_data else "Unknown")
+        email = request.POST.get('email') or (borrower_data.email if borrower_data else "")
+        phone = request.POST.get('phone') or (borrower_data.phone if borrower_data else "")
         current_user = request.user if request.user.is_authenticated else None
 
         Request.objects.create(
             asset=asset,
             user=request.user,
-            user_name=request.POST.get('user_name'),
-            department=request.POST.get('department'),
-            email=request.POST.get('email'),
-            phone=request.POST.get('phone'),
+            user_name=user_name,
+            department=department,
+            email=email,
+            phone=phone,
             return_date=request.POST.get('return_date'),
-            condition=request.POST.get('condition'),
-            remarks=request.POST.get('remarks'),
+            condition=request.POST.get('condition', ''),
+            remarks=request.POST.get('remarks', ''),
             request_type='return',
             status='pending'
         )
@@ -118,15 +122,19 @@ def extend_request(request, id):
     borrower_data = Request.objects.filter(asset=asset, status='approved', request_type='borrow').last()
 
     if request.method == 'POST':
+        user_name = request.POST.get('user_name') or (borrower_data.user_name if borrower_data else "Unknown Staff")
+        department = request.POST.get('department') or (borrower_data.department if borrower_data else "Unknown")
+        email = request.POST.get('email') or (borrower_data.email if borrower_data else "")
+        phone = request.POST.get('phone') or (borrower_data.phone if borrower_data else "")
         current_user = request.user if request.user.is_authenticated else None
 
         Request.objects.create(
             asset=asset,
-            user=request.user,
-            user_name=request.POST.get('user_name'),
-            department=request.POST.get('department'),
-            email=request.POST.get('email'),
-            phone=request.POST.get('phone'),
+            user=request.user if request.user.is_authenticated else None,
+            user_name=user_name,
+            department=department,
+            email=email,
+            phone=phone,
             return_date=request.POST.get('return_date'),
             purpose=request.POST.get('purpose'),
             request_type='extend',
