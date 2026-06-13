@@ -51,6 +51,9 @@ def borrow_request(request, id=None):
     selected_asset = None
     if id:
         selected_asset = get_object_or_404(Asset, id=id)
+        assets = Asset.objects.all().filter(Q(status='Available') | Q(id=id))
+    else:
+        assets = all_assets
 
     if request.method == 'POST':
         asset_id = request.POST.get('asset')
@@ -73,11 +76,12 @@ def borrow_request(request, id=None):
             status='pending'
         )
         
+        pass
         messages.success(request, f"Request for {asset_to_borrow.name} submitted!")
         return redirect('manage_assets' if request.user.is_authenticated else 'borrow_request_empty')
         
     return render(request, 'borrow.html', {
-        'assets': all_assets,
+        'assets': assets,
         'selected_asset': selected_asset
     })
 

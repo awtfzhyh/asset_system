@@ -60,6 +60,7 @@
             <div class="row">
                 <div class="col-md-8 mb-4">
                     <label for="asset" class="form-label label-required">Select Asset</label>
+                    <p>Debug Check: Total assets passed to form is {{ assets|length }}</p>
                     <select class="form-select" id="asset" name="asset" required>
                         <option value="" disabled {% if not selected_asset %}selected{% endif %}>Choose an equipment...</option>
                         {% for a in assets %}
