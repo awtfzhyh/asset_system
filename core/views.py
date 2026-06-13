@@ -364,13 +364,15 @@ def approve_request(request, id):
         asset.status = 'Available'
     asset.save()
 
+    safe_due_date = req.return_date if hasattr(req, 'return_date') and req.return_date else ""
+
     context = {
         'user_name': req.user_name,
         'status': 'approved',
         'request_type': req.request_type,
         'asset_name': asset.name,
         'serial_num': asset.serial_num,
-        'due_date': req.return_date if req.request_type == 'borrow' else None,
+        'due_date': safe_due_date if req.request_type == 'borrow' else "", # Safe fallback to string
         'feedback_message': "Your request has been verified and approved. Please ensure the asset is handled according to COE guidelines."
     }
     
