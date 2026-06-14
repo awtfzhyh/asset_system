@@ -40,8 +40,8 @@ urlpatterns = [
     # FORMS
     path('borrow/', views.borrow_request, name='borrow_request_empty'),
     path('borrow/<int:id>/', views.borrow_request, name='borrow_asset'),
-    path('return/<int:id>/', views.return_request, name='return_asset'),
-    path('extend/<int:id>/', views.extend_request, name='extend_asset'),
+    path('return/<int:id>/', views.return_request, name='return_request'),
+    path('extend/<int:id>/', views.extend_request, name='extend_request'),
 
     # REPORT
     path('report/', views.report, name='report'),
