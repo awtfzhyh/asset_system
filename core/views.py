@@ -416,8 +416,9 @@ def approve_request(request, id):
             subject=f"APPROVED: {asset.name} - COE Asset Management",
             message=text_content,
             from_email=settings.DEFAULT_FROM_EMAIL,
-            recipient_list=[req.email],
-            html_message=html_content
+            recipient_list=[req.email] if req.email else [settings.DEFAULT_FROM_EMAIL],
+            html_message=html_content,
+            fail_silently=False
         )
         messages.success(request, "Request approved and SDEC staff notified.")
     except Exception as e:
