@@ -376,11 +376,23 @@ def approve_request(request, id):
         asset.status = 'Borrowed'
     elif req.request_type == 'return':
         asset.status = 'Available'
+    elif req.request_type == 'extend':
+        asset.status = 'Borrowed'
+    
+    original_borrow = Request.objects.filter(
+            asset=asset, 
+            status='approved', 
+            request_type='borrow'
+        ).order_by('-created_at').first()
+        
+    if original_borrow and req.return_date:
+        original_borrow.return_date = req.return_date
+        original_borrow.save()
+            
     asset.save()
 
     safe_due_date = ""
     if req.return_date:
-        # If it's already a date/datetime object, format nicely for email scanning
         try:
             safe_due_date = req.return_date.strftime("%d %B %Y")
         except AttributeError:

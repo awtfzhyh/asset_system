@@ -17,7 +17,8 @@
         <p>{{ borrowed }}</p>
     </div>
 
-    <div class="card" style="border-left-color: #e74c3c;"> <h3>Pending Return</h3>
+    <div class="card" style="border-left-color: #e74c3c;"> 
+        <h3>Pending Return</h3>
         <p style="color: #e74c3c;">{{ pending_return }}</p>
     </div>
 
@@ -51,6 +52,9 @@
                     {{ item.asset.name }}
                     <br><small class="text-muted">S/N: {{ item.asset.serial_num }}</small>
                 </td>
+                <td>
+                    <strong>{{ item.return_date|date:"d M Y" }}</strong>
+                </td>
                 <td style="text-align: center;">
                     <a href="{% url 'return_request' item.asset.id %}" class="btn-sm-action btn-return">Return</a>
                     <a href="{% url 'extend_request' item.asset.id %}" class="btn-sm-action btn-extend">Extend</a>
@@ -64,22 +68,6 @@
         </tbody>
     </table>
 </div>
-
-<style>
-    .btn-sm-action {
-        padding: 5px 10px;
-        border-radius: 4px;
-        text-decoration: none;
-        font-size: 11px;
-        font-weight: 600;
-        margin: 0 2px;
-        display: inline-block;
-    }
-    .btn-return { background-color: #f39c12; color: white; }
-    .btn-extend { background-color: #3498db; color: white; }
-    .btn-return:hover, .btn-extend:hover { opacity: 0.8; color: white; }
-</style>
-
 <h2 style="margin-top: 30px; color: #e74c3c;">⚠️ Priority Alerts (Overdue)</h2>
 
 <div class="table-wrapper overdue-table">
@@ -142,10 +130,11 @@
         border-radius: 12px;
         overflow: hidden;
         box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        margin-bottom: 20px;
     }
     table { width: 100%; border-collapse: collapse; }
     th { background: #f8f9fa; padding: 15px; text-align: left; font-size: 12px; color: #666; }
-    td { padding: 15px; border-bottom: 1px solid #eee; font-size: 14px; }
+    td { padding: 15px; border-bottom: 1px solid #eee; font-size: 14px; vertical-align: middle; }
     
     .overdue-row:hover { background-color: #fff5f5; }
     .text-danger { color: #e74c3c; }
@@ -159,6 +148,19 @@
         font-weight: bold;
     }
 
+    .btn-sm-action {
+        padding: 5px 10px;
+        border-radius: 4px;
+        text-decoration: none;
+        font-size: 11px;
+        font-weight: 600;
+        margin: 0 2px;
+        display: inline-block;
+    }
+    .btn-return { background-color: #f39c12; color: white; }
+    .btn-extend { background-color: #3498db; color: white; }
+    .btn-return:hover, .btn-extend:hover { opacity: 0.8; color: white; }
+
     .btn-notify {
         background: #273c75;
         color: white;
@@ -167,6 +169,7 @@
         text-decoration: none;
         font-size: 12px;
     }
+    .btn-notify:hover { opacity: 0.9; }
 
     .empty-msg { text-align: center; color: #999; padding: 40px !important; }
 </style>
