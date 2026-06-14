@@ -362,6 +362,8 @@ def manage_requests(request):
 
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
+import resend
+import os
 
 @login_required
 def approve_request(request, id):
@@ -411,20 +413,19 @@ def approve_request(request, id):
     html_content = render_to_string('asset_status_email.html', context)
     text_content = strip_tags(html_content)
 
+   # Inside approve_request
     try:
-        send_mail(
-            subject=f"APPROVED: {asset.name} - COE Asset Management",
-            message=text_content,
-            from_email=settings.DEFAULT_FROM_EMAIL,
-            recipient_list=[req.email] if req.email else [settings.DEFAULT_FROM_EMAIL],
-            html_message=html_content,
-            fail_silently=False
-        )
-        messages.success(request, "Request approved and SDEC staff notified.")
+        resend.api_key = os.environ.get("RESEND_API_KEY")
+        resend.Emails.send({
+            "from": "CoE Asset System <onboarding@resend.dev>",
+            "to": req.email if req.email else "your_test_email@gmail.com",
+            "subject": f"APPROVED: {asset.name} - COE Asset Management",
+            "html": html_content
+        })
+        messages.success(request, "Request processed and staff notified.")
     except Exception as e:
-        messages.error(request, f"Approval saved, but email failed: {e}")
-
-    return redirect('dashboard')
+        messages.warning(request, f"Processed successfully, but notification skipped: {e}")
+        return redirect('dashboard')
 
 @login_required
 def reject_request(request, id):
