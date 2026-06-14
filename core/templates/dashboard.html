@@ -56,8 +56,8 @@
                         <span class="badge" style="background:#f1c40f; color:black; font-size:10px;">DUE TODAY</span>
                 </td>
                 <td style="text-align: center;">
-                    <a href="{% url 'return_asset' item.asset.id %}" class="btn-sm-action btn-return">Return</a>
-                    <a href="{% url 'extend_asset' item.asset.id %}" class="btn-sm-action btn-extend">Extend</a>
+                    <a href="{% url 'return_request' item.asset.id %}" class="btn-sm-action btn-return">Return</a>
+                    <a href="{% url 'extend_request' item.asset.id %}" class="btn-sm-action btn-extend">Extend</a>
                 </td>
             </tr>
             {% empty %}
