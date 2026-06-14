@@ -32,6 +32,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['asset-system-ryfn.onrender.com','*']
 
+CSRF_TRUSTED_ORIGINS = ['https://asset-system-ryfn.onrender.com']
 
 # Application definition
 
