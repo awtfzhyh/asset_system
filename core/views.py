@@ -378,16 +378,22 @@ def approve_request(request, id):
         asset.status = 'Available'
     asset.save()
 
-    safe_due_date = req.return_date if hasattr(req, 'return_date') and req.return_date else ""
-
+    safe_due_date = ""
+    if req.return_date:
+        # If it's already a date/datetime object, format nicely for email scanning
+        try:
+            safe_due_date = req.return_date.strftime("%d %B %Y")
+        except AttributeError:
+            safe_due_date = str(req.return_date)
+            
     context = {
         'user_name': req.user_name,
         'status': 'approved',
         'request_type': req.request_type,
         'asset_name': asset.name,
         'serial_num': asset.serial_num,
-        'due_date': safe_due_date if req.request_type == 'borrow' else "", # Safe fallback to string
-        'feedback_message': "Your request has been verified and approved. Please ensure the asset is handled according to COE guidelines."
+        'feedback_message': "Your request has been verified and approved. Please ensure the asset is handled according to COE guidelines.",
+        'due_date': safe_due_date,
     }
     
     html_content = render_to_string('asset_status_email.html', context)
